@@ -1,4 +1,22 @@
+import {
+  BloodType,
+  Department,
+  PatientPriority,
+  PatientStatus,
+  PATIENT_STATUS_VALUES,
+  PATIENT_PRIORITY_VALUES,
+  DEPARTMENT_VALUES,
+  BLOOD_TYPE_VALUES,
+} from '../enums'
+import { Locale } from '../enums/locale.enum'
 import type { PatientFormData, PatientRecord } from '../types/patient'
+
+export {
+  PATIENT_STATUS_VALUES as STATUSES,
+  PATIENT_PRIORITY_VALUES,
+  DEPARTMENT_VALUES as DEPARTMENTS,
+  BLOOD_TYPE_VALUES as BLOOD_TYPES,
+}
 
 export function generatePatientId(existing: PatientRecord[]): string {
   const maxNum = existing.reduce((max, p) => {
@@ -14,10 +32,10 @@ export function createEmptyPatient(): PatientFormData {
     fullName: '',
     birthDate: now,
     appointmentDate: now,
-    department: 'Dahiliye',
-    status: 'Bekliyor',
-    priority: 'normal',
-    bloodType: 'A+',
+    department: Department.INTERNAL,
+    status: PatientStatus.WAITING,
+    priority: PatientPriority.NORMAL,
+    bloodType: BloodType.A_POS,
     score: 3,
     note_tr: '',
     note_en: '',
@@ -89,37 +107,11 @@ export function filterPatientsToolbar(
   return result
 }
 
-export function formatDate(dateStr: string, locale: 'tr' | 'en'): string {
+export function formatDate(dateStr: string, locale: Locale): string {
   const date = new Date(dateStr)
-  return date.toLocaleDateString(locale === 'tr' ? 'tr-TR' : 'en-US', {
+  return date.toLocaleDateString(locale === Locale.TR ? 'tr-TR' : 'en-US', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   })
 }
-
-export const DEPARTMENTS = [
-  'Dahiliye',
-  'Nöroloji',
-  'Kardiyoloji',
-  'Ortopedi',
-  'Pediatri',
-] as const
-
-export const STATUSES = [
-  'Bekliyor',
-  'Muayenede',
-  'Tamamlandı',
-  'İptal',
-] as const
-
-export const BLOOD_TYPES = [
-  'A+',
-  'A-',
-  'B+',
-  'B-',
-  'AB+',
-  'AB-',
-  '0+',
-  '0-',
-] as const

@@ -10,13 +10,13 @@ import {
 } from 'antd'
 import { useEffect } from 'react'
 import type { PatientFormData, PatientRecord } from '../types/patient'
-import { useLanguage } from '../context/LanguageContext'
+import { PatientPriority, PATIENT_STATUS_VALUES } from '../enums'
+import { useLanguage } from '../hooks/useLanguage'
 import {
   BLOOD_TYPES,
   createEmptyPatient,
   DEPARTMENTS,
   patientToForm,
-  STATUSES,
 } from '../utils/patientHelpers'
 
 interface PatientFormModalProps {
@@ -120,7 +120,10 @@ export function PatientFormModal({
           <Col xs={24} sm={12}>
             <Form.Item name="status" label={t.status}>
               <Select
-                options={STATUSES.map((s) => ({ value: s, label: s }))}
+                options={PATIENT_STATUS_VALUES.map((s) => ({
+                  value: s,
+                  label: s,
+                }))}
               />
             </Form.Item>
           </Col>
@@ -128,8 +131,8 @@ export function PatientFormModal({
             <Form.Item name="priority" label={t.priority}>
               <Select
                 options={[
-                  { value: 'normal', label: t.priorityNormal },
-                  { value: 'acil', label: t.priorityUrgent },
+                  { value: PatientPriority.NORMAL, label: t.priorityNormal },
+                  { value: PatientPriority.URGENT, label: t.priorityUrgent },
                 ]}
               />
             </Form.Item>

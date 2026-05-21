@@ -5,14 +5,15 @@ import {
 } from '@ant-design/icons'
 import { Button, Card, Collapse, Descriptions, Space, Tag, Typography } from 'antd'
 import type { PatientRecord } from '../types/patient'
-import { useLanguage } from '../context/LanguageContext'
+import { PatientPriority, PatientStatus } from '../enums'
+import { useLanguage } from '../hooks/useLanguage'
 import { formatDate } from '../utils/patientHelpers'
 
-const STATUS_COLORS: Record<PatientRecord['status'], string> = {
-  Bekliyor: 'gold',
-  Muayenede: 'processing',
-  Tamamlandı: 'success',
-  İptal: 'error',
+const STATUS_COLORS: Record<PatientStatus, string> = {
+  [PatientStatus.WAITING]: 'gold',
+  [PatientStatus.EXAMINING]: 'processing',
+  [PatientStatus.COMPLETED]: 'success',
+  [PatientStatus.CANCELLED]: 'error',
 }
 
 interface PatientAccordionProps {
@@ -58,7 +59,11 @@ export function PatientAccordion({
           <Tag color={STATUS_COLORS[patient.status]}>
             {getStatusLabel(patient.status)}
           </Tag>
-          <Tag color={patient.priority === 'acil' ? 'red' : 'default'}>
+          <Tag
+            color={
+              patient.priority === PatientPriority.URGENT ? 'red' : 'default'
+            }
+          >
             {getPriorityLabel(patient.priority)}
           </Tag>
           <Tag>{patient.bloodType}</Tag>

@@ -1,15 +1,25 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { Alert, Button, Layout, Modal, Spin } from 'antd'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Header } from './components/Header'
 import { PatientDetailModal } from './components/PatientDetailModal'
 import { PatientFilters } from './components/PatientFilters'
 import { PatientFormModal } from './components/PatientFormModal'
 import { PatientList } from './components/PatientList'
-import { LanguageProvider, useLanguage } from './context/LanguageContext'
 import { useFilterQueryParams } from './hooks/useFilterQueryParams'
-import { usePatients } from './hooks/usePatients'
+import { useLanguage } from './hooks/useLanguage'
 import { AntDesignProvider } from './providers/AntDesignProvider'
+import { useAppDispatch, useAppSelector } from './store/hooks'
+import {
+  addPatient,
+  deletePatient,
+  fetchPatientsThunk,
+  selectPatients,
+  selectPatientsError,
+  selectPatientsLoading,
+  updatePatient,
+} from './store/slices/patientsSlice'
 import type { PatientFormData, PatientRecord } from './types/patient'
 import { filterPatientsToolbar } from './utils/patientHelpers'
 
@@ -19,15 +29,10 @@ type ModalMode = 'add' | 'edit' | null
 
 function AppContent() {
   const { t } = useLanguage()
-  const {
-    patients,
-    loading,
-    error,
-    loadPatients,
-    addPatient,
-    updatePatient,
-    deletePatient,
-  } = usePatients()
+  const dispatch = useAppDispatch()
+  const patients = useAppSelector(selectPatients)
+  const loading = useAppSelector(selectPatientsLoading)
+  const error = useAppSelector(selectPatientsError)
 
   const {
     search,
@@ -43,6 +48,10 @@ function AppContent() {
   const [modalMode, setModalMode] = useState<ModalMode>(null)
   const [editingPatient, setEditingPatient] = useState<PatientRecord | null>(null)
   const [viewingPatient, setViewingPatient] = useState<PatientRecord | null>(null)
+
+  useEffect(() => {
+    dispatch(fetchPatientsThunk())
+  }, [dispatch])
 
   const filteredPatients = useMemo(
     () =>
@@ -77,15 +86,20 @@ function AppContent() {
       okText: t.deletePatient,
       okType: 'danger',
       cancelText: t.cancel,
-      onOk: () => deletePatient(patient.id),
+      onOk: () => {
+        dispatch(deletePatient(patient.id))
+        toast.success(t.toastDeleteSuccess)
+      },
     })
   }
 
   const handleFormSubmit = (data: PatientFormData) => {
     if (modalMode === 'edit' && editingPatient) {
-      updatePatient(editingPatient.id, data)
+      dispatch(updatePatient({ id: editingPatient.id, data }))
+      toast.success(t.toastEditSuccess)
     } else {
-      addPatient(data)
+      dispatch(addPatient(data))
+      toast.success(t.toastAddSuccess)
     }
   }
 
@@ -113,7 +127,11 @@ function AppContent() {
             description={error}
             showIcon
             action={
-              <Button size="small" danger onClick={loadPatients}>
+              <Button
+                size="small"
+                danger
+                onClick={() => dispatch(fetchPatientsThunk())}
+              >
                 {t.retry}
               </Button>
             }
@@ -160,10 +178,8 @@ function AppContent() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AntDesignProvider>
-        <AppContent />
-      </AntDesignProvider>
-    </LanguageProvider>
+    <AntDesignProvider>
+      <AppContent />
+    </AntDesignProvider>
   )
 }

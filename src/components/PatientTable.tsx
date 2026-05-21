@@ -7,14 +7,10 @@ import { Button, Space, Table, Tag, Typography } from 'antd'
 import type { TableColumnsType, TableProps } from 'antd'
 import { useMemo } from 'react'
 import { PAGE_SIZE } from '../constants/pagination'
-import { useLanguage } from '../context/LanguageContext'
+import { PatientPriority, PatientStatus, PATIENT_STATUS_VALUES } from '../enums'
+import { useLanguage } from '../hooks/useLanguage'
 import type { PatientRecord } from '../types/patient'
-import {
-  BLOOD_TYPES,
-  DEPARTMENTS,
-  formatDate,
-  STATUSES,
-} from '../utils/patientHelpers'
+import { BLOOD_TYPES, DEPARTMENTS, formatDate } from '../utils/patientHelpers'
 
 interface PatientTableProps {
   patients: PatientRecord[]
@@ -23,11 +19,11 @@ interface PatientTableProps {
   onDelete: (patient: PatientRecord) => void
 }
 
-const STATUS_COLORS: Record<PatientRecord['status'], string> = {
-  Bekliyor: 'gold',
-  Muayenede: 'processing',
-  Tamamlandı: 'success',
-  İptal: 'error',
+const STATUS_COLORS: Record<PatientStatus, string> = {
+  [PatientStatus.WAITING]: 'gold',
+  [PatientStatus.EXAMINING]: 'processing',
+  [PatientStatus.COMPLETED]: 'success',
+  [PatientStatus.CANCELLED]: 'error',
 }
 
 export function PatientTable({
@@ -86,12 +82,12 @@ export function PatientTable({
         title: t.status,
         dataIndex: 'status',
         key: 'status',
-        filters: STATUSES.map((s) => ({
+        filters: PATIENT_STATUS_VALUES.map((s) => ({
           text: getStatusLabel(s),
           value: s,
         })),
         onFilter: (value, record) => record.status === value,
-        render: (status: PatientRecord['status']) => (
+        render: (status: PatientStatus) => (
           <Tag color={STATUS_COLORS[status]}>{getStatusLabel(status)}</Tag>
         ),
       },
@@ -100,12 +96,18 @@ export function PatientTable({
         dataIndex: 'priority',
         key: 'priority',
         filters: [
-          { text: getPriorityLabel('acil'), value: 'acil' },
-          { text: getPriorityLabel('normal'), value: 'normal' },
+          {
+            text: getPriorityLabel(PatientPriority.URGENT),
+            value: PatientPriority.URGENT,
+          },
+          {
+            text: getPriorityLabel(PatientPriority.NORMAL),
+            value: PatientPriority.NORMAL,
+          },
         ],
         onFilter: (value, record) => record.priority === value,
-        render: (priority: PatientRecord['priority']) => (
-          <Tag color={priority === 'acil' ? 'red' : 'default'}>
+        render: (priority: PatientPriority) => (
+          <Tag color={priority === PatientPriority.URGENT ? 'red' : 'default'}>
             {getPriorityLabel(priority)}
           </Tag>
         ),

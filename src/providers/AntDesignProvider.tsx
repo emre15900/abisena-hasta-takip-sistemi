@@ -2,8 +2,8 @@ import { ConfigProvider, theme } from 'antd'
 import trTR from 'antd/locale/tr_TR'
 import enUS from 'antd/locale/en_US'
 import type { ReactNode } from 'react'
-import { useLanguage } from '../context/LanguageContext'
-import { useTheme } from '../context/ThemeContext'
+import { useLanguage } from '../hooks/useLanguage'
+import { useTheme } from '../hooks/useTheme'
 
 export function AntDesignProvider({ children }: { children: ReactNode }) {
   const { locale } = useLanguage()

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { STATUSES } from '../utils/patientHelpers'
+import { PatientPriority, PatientStatus, PATIENT_STATUS_VALUES } from '../enums'
 
 export interface PatientFiltersState {
   search: string
@@ -13,7 +13,7 @@ const EMPTY_FILTERS: PatientFiltersState = {
   priorityFilter: '',
 }
 
-const VALID_PRIORITIES = ['acil', 'normal'] as const
+const VALID_PRIORITIES = Object.values(PatientPriority)
 
 function readFiltersFromUrl(): PatientFiltersState {
   const params = new URLSearchParams(window.location.search)
@@ -22,12 +22,10 @@ function readFiltersFromUrl(): PatientFiltersState {
 
   return {
     search: params.get('q') ?? '',
-    statusFilter: STATUSES.includes(status as (typeof STATUSES)[number])
+    statusFilter: PATIENT_STATUS_VALUES.includes(status as PatientStatus)
       ? status
       : '',
-    priorityFilter: VALID_PRIORITIES.includes(
-      priority as (typeof VALID_PRIORITIES)[number],
-    )
+    priorityFilter: VALID_PRIORITIES.includes(priority as PatientPriority)
       ? priority
       : '',
   }

@@ -7,6 +7,8 @@ Poliklinik hasta randevu ve takip paneli. Abisena / Panates teknik değerlendirm
 - **React 18** (Vite — Next.js kullanılmaz)
 - **TypeScript**
 - **Ant Design 6** (tablo, form, modal, filtreler, dark mode)
+- **Redux Toolkit** (tema, dil, hasta state)
+- **react-hot-toast** (işlem bildirimleri)
 - **Tailwind CSS** (layout yardımcıları)
 
 ## Özellikler
@@ -25,6 +27,8 @@ Poliklinik hasta randevu ve takip paneli. Abisena / Panates teknik değerlendirm
 | Mobil | Accordion liste görünümü |
 | Dark mode | Aydınlık / karanlık tema |
 | Dil | TR / EN arayüz desteği |
+| Kalıcılık | Ekleme/düzenleme/silme localStorage'da saklanır |
+| Bildirim | Başarılı işlemlerde sağ üst toast |
 
 ## API
 
@@ -54,9 +58,11 @@ yarn preview
 src/
 ├── api/           # API istekleri
 ├── components/    # UI bileşenleri
-├── context/       # Dil (i18n) context
-├── hooks/         # usePatients — state yönetimi
+├── enums/         # Merkezi enum tanımları
+├── hooks/         # useLanguage, useTheme, useFilterQueryParams
 ├── i18n/          # Çeviriler (TR/EN)
+├── services/      # localStorage hasta mutasyonları
+├── store/         # Redux Toolkit slices
 ├── types/         # PatientRecord tip tanımları
 └── utils/         # Filtre, sıralama, yardımcılar
 ```

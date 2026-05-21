@@ -1,8 +1,7 @@
-import { ClearOutlined, SearchOutlined } from '@ant-design/icons'
+import { FilterOutlined, SearchOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Input, Row, Select, Space, Tooltip, Typography } from 'antd'
-import type { PatientRecord } from '../types/patient'
-import { useLanguage } from '../context/LanguageContext'
-import { STATUSES } from '../utils/patientHelpers'
+import { PatientPriority, PatientStatus, PATIENT_STATUS_VALUES } from '../enums'
+import { useLanguage } from '../hooks/useLanguage'
 
 interface PatientFiltersProps {
   search: string
@@ -56,9 +55,9 @@ export function PatientFilters({
               placeholder={t.filterAllStatuses}
               value={statusFilter || undefined}
               onChange={(v) => onStatusFilterChange(v ?? '')}
-              options={STATUSES.map((status) => ({
+              options={PATIENT_STATUS_VALUES.map((status) => ({
                 value: status,
-                label: getStatusLabel(status as PatientRecord['status']),
+                label: getStatusLabel(status as PatientStatus),
               }))}
             />
           </Space>
@@ -76,8 +75,14 @@ export function PatientFilters({
               value={priorityFilter || undefined}
               onChange={(v) => onPriorityFilterChange(v ?? '')}
               options={[
-                { value: 'acil', label: getPriorityLabel('acil') },
-                { value: 'normal', label: getPriorityLabel('normal') },
+                {
+                  value: PatientPriority.URGENT,
+                  label: getPriorityLabel(PatientPriority.URGENT),
+                },
+                {
+                  value: PatientPriority.NORMAL,
+                  label: getPriorityLabel(PatientPriority.NORMAL),
+                },
               ]}
             />
           </Space>
@@ -87,7 +92,7 @@ export function PatientFilters({
           <Tooltip title={t.clearFilters}>
             <Button
               type="default"
-              icon={<ClearOutlined />}
+              icon={<FilterOutlined />}
               onClick={onClearFilters}
               disabled={!hasActiveFilters}
               aria-label={t.clearFilters}

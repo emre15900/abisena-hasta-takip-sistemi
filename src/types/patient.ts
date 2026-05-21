@@ -1,10 +1,6 @@
-export type PatientStatus =
-  | 'Bekliyor'
-  | 'Muayenede'
-  | 'Tamamlandı'
-  | 'İptal'
+import type { PatientPriority, PatientStatus } from '../enums'
 
-export type PatientPriority = 'acil' | 'normal'
+export type { PatientPriority, PatientStatus }
 
 export interface PatientRecord {
   id: string

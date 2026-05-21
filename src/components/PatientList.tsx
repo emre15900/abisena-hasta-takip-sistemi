@@ -1,7 +1,7 @@
 import { Pagination } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { PAGE_SIZE } from '../constants/pagination'
-import { useLanguage } from '../context/LanguageContext'
+import { useLanguage } from '../hooks/useLanguage'
 import type { PatientRecord } from '../types/patient'
 import { PatientAccordion } from './PatientAccordion'
 import { PatientTable } from './PatientTable'

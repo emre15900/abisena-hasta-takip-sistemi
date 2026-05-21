@@ -1,6 +1,6 @@
 import { Segmented } from 'antd'
-import { useLanguage } from '../context/LanguageContext'
-import type { Locale } from '../i18n/translations'
+import { Locale } from '../enums'
+import { useLanguage } from '../hooks/useLanguage'
 
 export function LanguageSwitcher() {
   const { locale, setLocale } = useLanguage()
@@ -10,8 +10,8 @@ export function LanguageSwitcher() {
       value={locale}
       onChange={setLocale}
       options={[
-        { value: 'tr', label: 'TR' },
-        { value: 'en', label: 'EN' },
+        { value: Locale.TR, label: 'TR' },
+        { value: Locale.EN, label: 'EN' },
       ]}
     />
   )

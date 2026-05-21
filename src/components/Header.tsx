@@ -1,7 +1,7 @@
 import { HeartOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Layout, Space, Typography } from 'antd'
-import { useLanguage } from '../context/LanguageContext'
-import { useTheme } from '../context/ThemeContext'
+import { useLanguage } from '../hooks/useLanguage'
+import { useTheme } from '../hooks/useTheme'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { ThemeToggle } from './ThemeToggle'
 
