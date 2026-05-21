@@ -1,10 +1,20 @@
-import { HiEye, HiPencil, HiTrash } from 'react-icons/hi2'
-import type { PatientRecord } from '../types/patient'
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+} from '@ant-design/icons'
+import { Button, Space, Table, Tag, Typography } from 'antd'
+import type { TableColumnsType, TableProps } from 'antd'
+import { useMemo } from 'react'
+import { PAGE_SIZE } from '../constants/pagination'
 import { useLanguage } from '../context/LanguageContext'
-import { formatDate } from '../utils/patientHelpers'
-import { cardClass } from '../utils/styles'
-import { PriorityBadge } from './PriorityBadge'
-import { StatusBadge } from './StatusBadge'
+import type { PatientRecord } from '../types/patient'
+import {
+  BLOOD_TYPES,
+  DEPARTMENTS,
+  formatDate,
+  STATUSES,
+} from '../utils/patientHelpers'
 
 interface PatientTableProps {
   patients: PatientRecord[]
@@ -13,142 +23,170 @@ interface PatientTableProps {
   onDelete: (patient: PatientRecord) => void
 }
 
+const STATUS_COLORS: Record<PatientRecord['status'], string> = {
+  Bekliyor: 'gold',
+  Muayenede: 'processing',
+  Tamamlandı: 'success',
+  İptal: 'error',
+}
+
 export function PatientTable({
   patients,
   onView,
   onEdit,
   onDelete,
 }: PatientTableProps) {
-  const { t, locale, getDiagnosis, getDepartmentLabel } = useLanguage()
+  const {
+    t,
+    locale,
+    getDiagnosis,
+    getDepartmentLabel,
+    getStatusLabel,
+    getPriorityLabel,
+  } = useLanguage()
 
-  if (patients.length === 0) {
-    return (
-      <div
-        className={`py-16 text-center ${cardClass} border-dashed dark:border-slate-600`}
-      >
-        <p className="text-slate-500 dark:text-slate-400">{t.noResults}</p>
-      </div>
-    )
-  }
-
-  return (
-    <div className={`hidden overflow-hidden md:block ${cardClass}`}>
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-900/50">
-            <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">
-              {t.fullName}
-            </th>
-            <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">
-              {t.department}
-            </th>
-            <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">
-              {t.bloodType}
-            </th>
-            <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">
-              {t.status}
-            </th>
-            <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">
-              {t.priority}
-            </th>
-            <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">
-              {t.appointmentDate}
-            </th>
-            <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">
-              {t.diagnosis}
-            </th>
-            <th className="px-4 py-3 text-right font-semibold text-slate-600 dark:text-slate-300">
-              {t.actions}
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
-          {patients.map((patient) => (
-            <tr
-              key={patient.id}
-              className="transition-colors hover:bg-clinic-50/30 dark:hover:bg-slate-700/50"
-            >
-              <td className="px-4 py-3">
-                <div className="font-medium text-slate-900 dark:text-slate-100">
-                  {patient.fullName}
-                </div>
-                <div className="text-xs text-slate-400">{patient.id}</div>
-              </td>
-              <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
-                {getDepartmentLabel(patient.department)}
-              </td>
-              <td className="px-4 py-3">
-                <span className="inline-flex rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200">
-                  {patient.bloodType}
-                </span>
-              </td>
-              <td className="px-4 py-3">
-                <StatusBadge status={patient.status} />
-              </td>
-              <td className="px-4 py-3">
-                <PriorityBadge priority={patient.priority} />
-              </td>
-              <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
-                {formatDate(patient.appointmentDate, locale)}
-              </td>
-              <td className="max-w-[180px] truncate px-4 py-3 text-slate-600 dark:text-slate-300">
-                {getDiagnosis(patient)}
-              </td>
-              <td className="px-4 py-3">
-                <div className="flex items-center justify-end gap-1">
-                  <ActionButton
-                    onClick={() => onView(patient)}
-                    title={t.details}
-                    icon={<HiEye className="h-4 w-4" />}
-                    variant="view"
-                  />
-                  <ActionButton
-                    onClick={() => onEdit(patient)}
-                    title={t.editPatient}
-                    icon={<HiPencil className="h-4 w-4" />}
-                    variant="edit"
-                  />
-                  <ActionButton
-                    onClick={() => onDelete(patient)}
-                    title={t.deletePatient}
-                    icon={<HiTrash className="h-4 w-4" />}
-                    variant="delete"
-                  />
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+  const columns: TableColumnsType<PatientRecord> = useMemo(
+    () => [
+      {
+        title: t.fullName,
+        dataIndex: 'fullName',
+        key: 'fullName',
+        sorter: (a, b) => a.fullName.localeCompare(b.fullName, 'tr'),
+        render: (name: string, record) => (
+          <div>
+            <Typography.Text strong>{name}</Typography.Text>
+            <br />
+            <Typography.Text type="secondary" className="text-xs">
+              {record.id}
+            </Typography.Text>
+          </div>
+        ),
+      },
+      {
+        title: t.department,
+        dataIndex: 'department',
+        key: 'department',
+        filters: DEPARTMENTS.map((d) => ({
+          text: getDepartmentLabel(d),
+          value: d,
+        })),
+        onFilter: (value, record) => record.department === value,
+        render: (dept: string) => getDepartmentLabel(dept),
+      },
+      {
+        title: t.bloodType,
+        dataIndex: 'bloodType',
+        key: 'bloodType',
+        filters: BLOOD_TYPES.map((bt) => ({ text: bt, value: bt })),
+        onFilter: (value, record) => record.bloodType === value,
+        sorter: (a, b) => a.bloodType.localeCompare(b.bloodType),
+        render: (bt: string) => <Tag>{bt}</Tag>,
+      },
+      {
+        title: t.status,
+        dataIndex: 'status',
+        key: 'status',
+        filters: STATUSES.map((s) => ({
+          text: getStatusLabel(s),
+          value: s,
+        })),
+        onFilter: (value, record) => record.status === value,
+        render: (status: PatientRecord['status']) => (
+          <Tag color={STATUS_COLORS[status]}>{getStatusLabel(status)}</Tag>
+        ),
+      },
+      {
+        title: t.priority,
+        dataIndex: 'priority',
+        key: 'priority',
+        filters: [
+          { text: getPriorityLabel('acil'), value: 'acil' },
+          { text: getPriorityLabel('normal'), value: 'normal' },
+        ],
+        onFilter: (value, record) => record.priority === value,
+        render: (priority: PatientRecord['priority']) => (
+          <Tag color={priority === 'acil' ? 'red' : 'default'}>
+            {getPriorityLabel(priority)}
+          </Tag>
+        ),
+      },
+      {
+        title: t.appointmentDate,
+        dataIndex: 'appointmentDate',
+        key: 'appointmentDate',
+        sorter: (a, b) =>
+          new Date(a.appointmentDate).getTime() -
+          new Date(b.appointmentDate).getTime(),
+        defaultSortOrder: 'descend',
+        render: (date: string) => formatDate(date, locale),
+      },
+      {
+        title: t.diagnosis,
+        key: 'diagnosis',
+        ellipsis: true,
+        render: (_, record) => getDiagnosis(record),
+      },
+      {
+        title: t.actions,
+        key: 'actions',
+        align: 'right',
+        width: 140,
+        render: (_, record) => (
+          <Space size="small">
+            <Button
+              type="text"
+              icon={<EyeOutlined />}
+              onClick={() => onView(record)}
+              title={t.details}
+            />
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              onClick={() => onEdit(record)}
+              title={t.editPatient}
+            />
+            <Button
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => onDelete(record)}
+              title={t.deletePatient}
+            />
+          </Space>
+        ),
+      },
+    ],
+    [
+      t,
+      locale,
+      getDiagnosis,
+      getDepartmentLabel,
+      getStatusLabel,
+      getPriorityLabel,
+      onView,
+      onEdit,
+      onDelete,
+    ],
   )
-}
 
-function ActionButton({
-  onClick,
-  title,
-  icon,
-  variant,
-}: {
-  onClick: () => void
-  title: string
-  icon: React.ReactNode
-  variant: 'view' | 'edit' | 'delete'
-}) {
-  const styles = {
-    view: 'text-slate-500 hover:bg-slate-100 hover:text-clinic-600 dark:hover:bg-slate-700 dark:hover:text-clinic-400',
-    edit: 'text-slate-500 hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-900/30 dark:hover:text-amber-400',
-    delete: 'text-slate-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30 dark:hover:text-rose-400',
+  const pagination: TableProps<PatientRecord>['pagination'] = {
+    pageSize: PAGE_SIZE,
+    showSizeChanger: false,
+    showTotal: (total) => `${total} ${t.patientCount}`,
+    position: ['bottomCenter'],
   }
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={title}
-      className={`rounded-lg p-2 transition ${styles[variant]}`}
-    >
-      {icon}
-    </button>
+    <div className="hidden md:block">
+      <Table<PatientRecord>
+        rowKey="id"
+        columns={columns}
+        dataSource={patients}
+        pagination={pagination}
+        locale={{ emptyText: t.noResults }}
+        scroll={{ x: 900 }}
+        size="middle"
+      />
+    </div>
   )
 }

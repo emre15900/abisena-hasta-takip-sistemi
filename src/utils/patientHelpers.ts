@@ -1,9 +1,4 @@
-import type {
-  PatientFormData,
-  PatientRecord,
-  SortDirection,
-  SortField,
-} from '../types/patient'
+import type { PatientFormData, PatientRecord } from '../types/patient'
 
 export function generatePatientId(existing: PatientRecord[]): string {
   const maxNum = existing.reduce((max, p) => {
@@ -68,13 +63,11 @@ export function patientToForm(patient: PatientRecord): PatientFormData {
   return { ...patient }
 }
 
-export function filterAndSortPatients(
+export function filterPatientsToolbar(
   patients: PatientRecord[],
   search: string,
   statusFilter: string,
   priorityFilter: string,
-  sortField: SortField,
-  sortDirection: SortDirection,
 ): PatientRecord[] {
   let result = [...patients]
 
@@ -93,37 +86,7 @@ export function filterAndSortPatients(
     result = result.filter((p) => p.priority === priorityFilter)
   }
 
-  result.sort((a, b) => {
-    let cmp = 0
-    switch (sortField) {
-      case 'fullName':
-        cmp = a.fullName.localeCompare(b.fullName, 'tr')
-        break
-      case 'appointmentDate':
-        cmp =
-          new Date(a.appointmentDate).getTime() -
-          new Date(b.appointmentDate).getTime()
-        break
-      case 'bloodType':
-        cmp = a.bloodType.localeCompare(b.bloodType)
-        break
-    }
-    return sortDirection === 'asc' ? cmp : -cmp
-  })
-
   return result
-}
-
-export function paginatePatients<T>(items: T[], page: number, pageSize: number) {
-  const totalPages = Math.max(1, Math.ceil(items.length / pageSize))
-  const safePage = Math.min(Math.max(1, page), totalPages)
-  const start = (safePage - 1) * pageSize
-  return {
-    items: items.slice(start, start + pageSize),
-    currentPage: safePage,
-    totalPages,
-    totalItems: items.length,
-  }
 }
 
 export function formatDate(dateStr: string, locale: 'tr' | 'en'): string {

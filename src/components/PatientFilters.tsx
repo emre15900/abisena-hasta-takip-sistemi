@@ -1,7 +1,7 @@
-import { HiMagnifyingGlass } from 'react-icons/hi2'
-import type { PatientRecord, SortDirection, SortField } from '../types/patient'
+import { SearchOutlined } from '@ant-design/icons'
+import { Card, Col, Input, Row, Select, Space, Typography } from 'antd'
+import type { PatientRecord } from '../types/patient'
 import { useLanguage } from '../context/LanguageContext'
-import { cardClass, inputClass, labelClass, selectClass } from '../utils/styles'
 import { STATUSES } from '../utils/patientHelpers'
 
 interface PatientFiltersProps {
@@ -11,10 +11,6 @@ interface PatientFiltersProps {
   onStatusFilterChange: (value: string) => void
   priorityFilter: string
   onPriorityFilterChange: (value: string) => void
-  sortField: SortField
-  onSortFieldChange: (value: SortField) => void
-  sortDirection: SortDirection
-  onSortDirectionChange: (value: SortDirection) => void
 }
 
 export function PatientFilters({
@@ -24,86 +20,67 @@ export function PatientFilters({
   onStatusFilterChange,
   priorityFilter,
   onPriorityFilterChange,
-  sortField,
-  onSortFieldChange,
-  sortDirection,
-  onSortDirectionChange,
 }: PatientFiltersProps) {
   const { t, getStatusLabel, getPriorityLabel } = useLanguage()
 
   return (
-    <div
-      className={`flex flex-col gap-4 p-4 lg:flex-row lg:items-end lg:flex-wrap ${cardClass}`}
-    >
-      <div className="min-w-[200px] flex-1">
-        <label className={labelClass}>{t.searchPlaceholder}</label>
-        <div className="relative">
-          <HiMagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={t.searchPlaceholder}
-            className={`${inputClass} pl-10`}
-          />
-        </div>
-      </div>
+    <Card size="small" className="!shadow-sm">
+      <Row gutter={[12, 12]} align="bottom">
+        <Col xs={24} md={10} lg={8}>
+          <Space direction="vertical" size={4} className="w-full">
+            <Typography.Text type="secondary" className="text-xs">
+              {t.searchPlaceholder}
+            </Typography.Text>
+            <Input
+              allowClear
+              prefix={<SearchOutlined />}
+              placeholder={t.searchPlaceholder}
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
+          </Space>
+        </Col>
 
-      <div className="w-full sm:w-44 lg:w-40">
-        <label className={labelClass}>{t.filterStatus}</label>
-        <select
-          value={statusFilter}
-          onChange={(e) => onStatusFilterChange(e.target.value)}
-          className={selectClass}
-        >
-          <option value="">{t.filterAllStatuses}</option>
-          {STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {getStatusLabel(status as PatientRecord['status'])}
-            </option>
-          ))}
-        </select>
-      </div>
+        <Col xs={12} md={7} lg={5}>
+          <Space direction="vertical" size={4} className="w-full">
+            <Typography.Text type="secondary" className="text-xs">
+              {t.filterStatus}
+            </Typography.Text>
+            <Select
+              allowClear
+              className="w-full"
+              placeholder={t.filterAllStatuses}
+              value={statusFilter || undefined}
+              onChange={(v) => onStatusFilterChange(v ?? '')}
+              options={[
+                ...STATUSES.map((status) => ({
+                  value: status,
+                  label: getStatusLabel(status as PatientRecord['status']),
+                })),
+              ]}
+            />
+          </Space>
+        </Col>
 
-      <div className="w-full sm:w-44 lg:w-40">
-        <label className={labelClass}>{t.filterPriority}</label>
-        <select
-          value={priorityFilter}
-          onChange={(e) => onPriorityFilterChange(e.target.value)}
-          className={selectClass}
-        >
-          <option value="">{t.filterAllPriorities}</option>
-          <option value="acil">{getPriorityLabel('acil')}</option>
-          <option value="normal">{getPriorityLabel('normal')}</option>
-        </select>
-      </div>
-
-      <div className="w-full sm:w-48 lg:w-44">
-        <label className={labelClass}>{t.sortBy}</label>
-        <select
-          value={sortField}
-          onChange={(e) => onSortFieldChange(e.target.value as SortField)}
-          className={selectClass}
-        >
-          <option value="fullName">{t.sortName}</option>
-          <option value="appointmentDate">{t.sortAppointment}</option>
-          <option value="bloodType">{t.sortBloodType}</option>
-        </select>
-      </div>
-
-      <div className="w-full sm:w-36 lg:w-32">
-        <label className={labelClass}>&nbsp;</label>
-        <select
-          value={sortDirection}
-          onChange={(e) =>
-            onSortDirectionChange(e.target.value as SortDirection)
-          }
-          className={selectClass}
-        >
-          <option value="asc">{t.asc}</option>
-          <option value="desc">{t.desc}</option>
-        </select>
-      </div>
-    </div>
+        <Col xs={12} md={7} lg={5}>
+          <Space direction="vertical" size={4} className="w-full">
+            <Typography.Text type="secondary" className="text-xs">
+              {t.filterPriority}
+            </Typography.Text>
+            <Select
+              allowClear
+              className="w-full"
+              placeholder={t.filterAllPriorities}
+              value={priorityFilter || undefined}
+              onChange={(v) => onPriorityFilterChange(v ?? '')}
+              options={[
+                { value: 'acil', label: getPriorityLabel('acil') },
+                { value: 'normal', label: getPriorityLabel('normal') },
+              ]}
+            />
+          </Space>
+        </Col>
+      </Row>
+    </Card>
   )
 }

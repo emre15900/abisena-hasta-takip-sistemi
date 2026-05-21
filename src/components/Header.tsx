@@ -1,7 +1,10 @@
-import { HiHeart, HiPlus } from 'react-icons/hi2'
+import { HeartOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, Layout, Space, Typography } from 'antd'
 import { useLanguage } from '../context/LanguageContext'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { ThemeToggle } from './ThemeToggle'
+
+const { Header: AntHeader } = Layout
 
 interface HeaderProps {
   onAddClick: () => void
@@ -11,35 +14,30 @@ export function Header({ onAddClick }: HeaderProps) {
   const { t } = useLanguage()
 
   return (
-    <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-slate-700/80 dark:bg-slate-900/80">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-        <div className="flex items-center gap-4">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-clinic-500 to-clinic-700 shadow-lg shadow-clinic-500/25">
-            <HiHeart className="h-6 w-6 text-white" />
+    <AntHeader className="!h-auto !px-4 !py-4 sm:!px-6 lg:!px-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <Space align="center" size="middle">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#0ea5e9] to-[#0369a1]">
+            <HeartOutlined className="text-xl !text-white" />
           </div>
           <div>
-            <h1 className="font-display text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-2xl">
+            <Typography.Title level={4} className="!mb-0">
               {t.appTitle}
-            </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            </Typography.Title>
+            <Typography.Text type="secondary" className="text-sm">
               {t.appSubtitle}
-            </p>
+            </Typography.Text>
           </div>
-        </div>
+        </Space>
 
-        <div className="flex items-center gap-3">
+        <Space wrap>
           <ThemeToggle />
           <LanguageSwitcher />
-          <button
-            type="button"
-            onClick={onAddClick}
-            className="inline-flex items-center gap-2 rounded-xl bg-clinic-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-clinic-600/25 transition hover:bg-clinic-700 active:scale-[0.98]"
-          >
-            <HiPlus className="h-4 w-4" />
+          <Button type="primary" icon={<PlusOutlined />} onClick={onAddClick}>
             {t.addPatient}
-          </button>
-        </div>
+          </Button>
+        </Space>
       </div>
-    </header>
+    </AntHeader>
   )
 }

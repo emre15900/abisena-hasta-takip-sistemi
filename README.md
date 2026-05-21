@@ -6,7 +6,8 @@ Poliklinik hasta randevu ve takip paneli. Abisena / Panates teknik değerlendirm
 
 - **React 18** (Vite — Next.js kullanılmaz)
 - **TypeScript**
-- **Tailwind CSS**
+- **Ant Design 6** (tablo, form, modal, filtreler, dark mode)
+- **Tailwind CSS** (layout yardımcıları)
 
 ## Özellikler
 
@@ -18,7 +19,8 @@ Poliklinik hasta randevu ve takip paneli. Abisena / Panates teknik değerlendirm
 | Silme | Local state üzerinden silinir |
 | Arama | Hasta adına göre metin araması |
 | Filtreleme | Durum ve önceliğe göre filtre |
-| Sıralama | Ad, randevu tarihi veya kan grubuna göre |
+| Sıralama | Tablo sütunlarından (ad, randevu, kan grubu) |
+| Sütun filtreleri | Bölüm, kan grubu, durum, öncelik |
 | Sayfalama | Sayfa başına 10 kayıt |
 | Mobil | Accordion liste görünümü |
 | Dark mode | Aydınlık / karanlık tema |
