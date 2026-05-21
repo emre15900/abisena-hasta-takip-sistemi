@@ -1,9 +1,22 @@
-import type {
-  PatientFormData,
-  PatientRecord,
-  SortDirection,
-  SortField,
-} from '../types/patient'
+import {
+  BloodType,
+  Department,
+  PatientPriority,
+  PatientStatus,
+  PATIENT_STATUS_VALUES,
+  PATIENT_PRIORITY_VALUES,
+  DEPARTMENT_VALUES,
+  BLOOD_TYPE_VALUES,
+} from '../enums'
+import { Locale } from '../enums/locale.enum'
+import type { PatientFormData, PatientRecord } from '../types/patient'
+
+export {
+  PATIENT_STATUS_VALUES as STATUSES,
+  PATIENT_PRIORITY_VALUES,
+  DEPARTMENT_VALUES as DEPARTMENTS,
+  BLOOD_TYPE_VALUES as BLOOD_TYPES,
+}
 
 export function generatePatientId(existing: PatientRecord[]): string {
   const maxNum = existing.reduce((max, p) => {
@@ -19,10 +32,10 @@ export function createEmptyPatient(): PatientFormData {
     fullName: '',
     birthDate: now,
     appointmentDate: now,
-    department: 'Dahiliye',
-    status: 'Bekliyor',
-    priority: 'normal',
-    bloodType: 'A+',
+    department: Department.INTERNAL,
+    status: PatientStatus.WAITING,
+    priority: PatientPriority.NORMAL,
+    bloodType: BloodType.A_POS,
     score: 3,
     note_tr: '',
     note_en: '',
@@ -68,13 +81,11 @@ export function patientToForm(patient: PatientRecord): PatientFormData {
   return { ...patient }
 }
 
-export function filterAndSortPatients(
+export function filterPatientsToolbar(
   patients: PatientRecord[],
   search: string,
   statusFilter: string,
   priorityFilter: string,
-  sortField: SortField,
-  sortDirection: SortDirection,
 ): PatientRecord[] {
   let result = [...patients]
 
@@ -93,70 +104,14 @@ export function filterAndSortPatients(
     result = result.filter((p) => p.priority === priorityFilter)
   }
 
-  result.sort((a, b) => {
-    let cmp = 0
-    switch (sortField) {
-      case 'fullName':
-        cmp = a.fullName.localeCompare(b.fullName, 'tr')
-        break
-      case 'appointmentDate':
-        cmp =
-          new Date(a.appointmentDate).getTime() -
-          new Date(b.appointmentDate).getTime()
-        break
-      case 'bloodType':
-        cmp = a.bloodType.localeCompare(b.bloodType)
-        break
-    }
-    return sortDirection === 'asc' ? cmp : -cmp
-  })
-
   return result
 }
 
-export function paginatePatients<T>(items: T[], page: number, pageSize: number) {
-  const totalPages = Math.max(1, Math.ceil(items.length / pageSize))
-  const safePage = Math.min(Math.max(1, page), totalPages)
-  const start = (safePage - 1) * pageSize
-  return {
-    items: items.slice(start, start + pageSize),
-    currentPage: safePage,
-    totalPages,
-    totalItems: items.length,
-  }
-}
-
-export function formatDate(dateStr: string, locale: 'tr' | 'en'): string {
+export function formatDate(dateStr: string, locale: Locale): string {
   const date = new Date(dateStr)
-  return date.toLocaleDateString(locale === 'tr' ? 'tr-TR' : 'en-US', {
+  return date.toLocaleDateString(locale === Locale.TR ? 'tr-TR' : 'en-US', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   })
 }
-
-export const DEPARTMENTS = [
-  'Dahiliye',
-  'Nöroloji',
-  'Kardiyoloji',
-  'Ortopedi',
-  'Pediatri',
-] as const
-
-export const STATUSES = [
-  'Bekliyor',
-  'Muayenede',
-  'Tamamlandı',
-  'İptal',
-] as const
-
-export const BLOOD_TYPES = [
-  'A+',
-  'A-',
-  'B+',
-  'B-',
-  'AB+',
-  'AB-',
-  '0+',
-  '0-',
-] as const

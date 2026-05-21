@@ -1,16 +1,20 @@
-import { useState } from 'react'
 import {
-  HiChevronDown,
-  HiEye,
-  HiPencil,
-  HiTrash,
-} from 'react-icons/hi2'
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+} from '@ant-design/icons'
+import { Button, Card, Collapse, Descriptions, Space, Tag, Typography } from 'antd'
 import type { PatientRecord } from '../types/patient'
-import { useLanguage } from '../context/LanguageContext'
+import { PatientPriority, PatientStatus } from '../enums'
+import { useLanguage } from '../hooks/useLanguage'
 import { formatDate } from '../utils/patientHelpers'
-import { cardClass } from '../utils/styles'
-import { PriorityBadge } from './PriorityBadge'
-import { StatusBadge } from './StatusBadge'
+
+const STATUS_COLORS: Record<PatientStatus, string> = {
+  [PatientStatus.WAITING]: 'gold',
+  [PatientStatus.EXAMINING]: 'processing',
+  [PatientStatus.COMPLETED]: 'success',
+  [PatientStatus.CANCELLED]: 'error',
+}
 
 interface PatientAccordionProps {
   patients: PatientRecord[]
@@ -25,144 +29,120 @@ export function PatientAccordion({
   onEdit,
   onDelete,
 }: PatientAccordionProps) {
-  const { t, locale, getDiagnosis, getNote, getDepartmentLabel } = useLanguage()
-  const [openId, setOpenId] = useState<string | null>(null)
+  const {
+    t,
+    locale,
+    getDiagnosis,
+    getNote,
+    getDepartmentLabel,
+    getStatusLabel,
+    getPriorityLabel,
+  } = useLanguage()
 
   if (patients.length === 0) {
     return (
-      <div
-        className={`py-16 text-center md:hidden ${cardClass} border-dashed dark:border-slate-600`}
-      >
-        <p className="text-slate-500 dark:text-slate-400">{t.noResults}</p>
-      </div>
+      <Card className="md:hidden">
+        <Typography.Text type="secondary">{t.noResults}</Typography.Text>
+      </Card>
     )
   }
 
-  const toggle = (id: string) => {
-    setOpenId((prev) => (prev === id ? null : id))
-  }
+  const items = patients.map((patient) => ({
+    key: patient.id,
+    label: (
+      <div>
+        <Typography.Text strong>{patient.fullName}</Typography.Text>
+        <Typography.Text type="secondary" className="ml-2 text-xs">
+          {patient.id}
+        </Typography.Text>
+        <div className="mt-1 flex flex-wrap gap-1">
+          <Tag color={STATUS_COLORS[patient.status]}>
+            {getStatusLabel(patient.status)}
+          </Tag>
+          <Tag
+            color={
+              patient.priority === PatientPriority.URGENT ? 'red' : 'default'
+            }
+          >
+            {getPriorityLabel(patient.priority)}
+          </Tag>
+          <Tag>{patient.bloodType}</Tag>
+        </div>
+      </div>
+    ),
+    children: (
+      <div className="space-y-3">
+        <Descriptions column={1} size="small" bordered>
+          <Descriptions.Item label={t.department}>
+            {getDepartmentLabel(patient.department)}
+          </Descriptions.Item>
+          <Descriptions.Item label={t.bloodType}>
+            {patient.bloodType}
+          </Descriptions.Item>
+          <Descriptions.Item label={t.appointmentDate}>
+            {formatDate(patient.appointmentDate, locale)}
+          </Descriptions.Item>
+          <Descriptions.Item label={t.birthDate}>
+            {formatDate(patient.birthDate, locale)}
+          </Descriptions.Item>
+          <Descriptions.Item label={t.diagnosis}>
+            {getDiagnosis(patient)}
+          </Descriptions.Item>
+          <Descriptions.Item label={t.note}>
+            {getNote(patient)}
+          </Descriptions.Item>
+          <Descriptions.Item label={t.isInsured}>
+            {patient.isInsured ? t.yes : t.no}
+          </Descriptions.Item>
+          <Descriptions.Item label={t.isFollowUp}>
+            {patient.isFollowUp ? t.yes : t.no}
+          </Descriptions.Item>
+          <Descriptions.Item label={t.isVaccinated}>
+            {patient.isVaccinated ? t.yes : t.no}
+          </Descriptions.Item>
+        </Descriptions>
 
-  return (
-    <div className="space-y-2 md:hidden">
-      {patients.map((patient) => {
-        const isOpen = openId === patient.id
-        return (
-          <div key={patient.id} className={cardClass}>
-            <button
-              type="button"
-              onClick={() => toggle(patient.id)}
-              className="flex w-full items-center justify-between gap-3 p-4 text-left"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold text-slate-900 dark:text-slate-100">
-                  {patient.fullName}
-                </p>
-                <p className="text-xs text-slate-400">{patient.id}</p>
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  <StatusBadge status={patient.status} />
-                  <PriorityBadge priority={patient.priority} />
-                </div>
-              </div>
-              <HiChevronDown
-                className={`h-5 w-5 shrink-0 text-slate-400 transition-transform ${
-                  isOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-
-            {isOpen && (
-              <div className="space-y-3 border-t border-slate-100 px-4 pb-4 pt-3 dark:border-slate-700">
-                <InfoRow label={t.department} value={getDepartmentLabel(patient.department)} />
-                <InfoRow label={t.bloodType} value={patient.bloodType} />
-                <InfoRow
-                  label={t.appointmentDate}
-                  value={formatDate(patient.appointmentDate, locale)}
-                />
-                <InfoRow
-                  label={t.birthDate}
-                  value={formatDate(patient.birthDate, locale)}
-                />
-                <InfoRow label={t.diagnosis} value={getDiagnosis(patient)} />
-                <InfoRow label={t.note} value={getNote(patient)} />
-                <InfoRow label={t.isInsured} value={patient.isInsured ? t.yes : t.no} />
-                <InfoRow label={t.isFollowUp} value={patient.isFollowUp ? t.yes : t.no} />
-                <InfoRow label={t.isVaccinated} value={patient.isVaccinated ? t.yes : t.no} />
-
-                {patient.tags.length > 0 && (
-                  <div>
-                    <p className="text-xs font-medium text-slate-400">{t.tags}</p>
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      {patient.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex gap-2 pt-1">
-                  <MobileAction
-                    onClick={() => onView(patient)}
-                    label={t.details}
-                    icon={<HiEye className="h-4 w-4" />}
-                  />
-                  <MobileAction
-                    onClick={() => onEdit(patient)}
-                    label={t.editPatient}
-                    icon={<HiPencil className="h-4 w-4" />}
-                  />
-                  <MobileAction
-                    onClick={() => onDelete(patient)}
-                    label={t.deletePatient}
-                    icon={<HiTrash className="h-4 w-4" />}
-                    danger
-                  />
-                </div>
-              </div>
-            )}
+        {patient.tags.length > 0 && (
+          <div>
+            <Typography.Text type="secondary" className="text-xs">
+              {t.tags}
+            </Typography.Text>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {patient.tags.map((tag) => (
+                <Tag key={tag}>{tag}</Tag>
+              ))}
+            </div>
           </div>
-        )
-      })}
-    </div>
-  )
-}
+        )}
 
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between gap-4 text-sm">
-      <span className="shrink-0 text-slate-400">{label}</span>
-      <span className="text-right text-slate-800 dark:text-slate-200">{value}</span>
-    </div>
-  )
-}
+        <Space wrap className="w-full">
+          <Button
+            icon={<EyeOutlined />}
+            onClick={() => onView(patient)}
+          >
+            {t.details}
+          </Button>
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => onEdit(patient)}
+          >
+            {t.editPatient}
+          </Button>
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => onDelete(patient)}
+          >
+            {t.deletePatient}
+          </Button>
+        </Space>
+      </div>
+    ),
+  }))
 
-function MobileAction({
-  onClick,
-  label,
-  icon,
-  danger,
-}: {
-  onClick: () => void
-  label: string
-  icon: React.ReactNode
-  danger?: boolean
-}) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition ${
-        danger
-          ? 'border-rose-200 text-rose-600 hover:bg-rose-50 dark:border-rose-800 dark:text-rose-400 dark:hover:bg-rose-900/30'
-          : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700'
-      }`}
-    >
-      {icon}
-      {label}
-    </button>
+    <div className="md:hidden">
+      <Collapse items={items} accordion />
+    </div>
   )
 }

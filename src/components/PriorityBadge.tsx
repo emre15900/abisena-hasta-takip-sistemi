@@ -1,13 +1,13 @@
-import type { PatientRecord } from '../types/patient'
-import { useLanguage } from '../context/LanguageContext'
+import { PatientPriority } from '../enums'
+import { useLanguage } from '../hooks/useLanguage'
 
 interface PriorityBadgeProps {
-  priority: PatientRecord['priority']
+  priority: PatientPriority
 }
 
 export function PriorityBadge({ priority }: PriorityBadgeProps) {
   const { getPriorityLabel } = useLanguage()
-  const isUrgent = priority === 'acil'
+  const isUrgent = priority === PatientPriority.URGENT
 
   return (
     <span

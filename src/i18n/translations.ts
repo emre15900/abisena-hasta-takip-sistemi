@@ -1,4 +1,6 @@
-export type Locale = 'tr' | 'en'
+import { Locale } from '../enums'
+
+export type { Locale }
 
 export const translations = {
   tr: {
@@ -22,6 +24,7 @@ export const translations = {
     filterAll: 'Tümü',
     filterAllStatuses: 'Tüm durumlar',
     filterAllPriorities: 'Tüm öncelikler',
+    clearFilters: 'Filtreleri temizle',
     sortBy: 'Sırala',
     sortName: 'Ada göre',
     sortAppointment: 'Randevu tarihine göre',
@@ -58,6 +61,9 @@ export const translations = {
     language: 'Dil',
     darkMode: 'Karanlık mod',
     lightMode: 'Aydınlık mod',
+    toastAddSuccess: 'Hasta kaydı başarıyla eklendi.',
+    toastEditSuccess: 'Hasta kaydı başarıyla güncellendi.',
+    toastDeleteSuccess: 'Hasta kaydı başarıyla silindi.',
     departments: {
       Dahiliye: 'Dahiliye',
       Nöroloji: 'Nöroloji',
@@ -87,6 +93,7 @@ export const translations = {
     filterAll: 'All',
     filterAllStatuses: 'All statuses',
     filterAllPriorities: 'All priorities',
+    clearFilters: 'Clear filters',
     sortBy: 'Sort by',
     sortName: 'By name',
     sortAppointment: 'By appointment date',
@@ -123,6 +130,9 @@ export const translations = {
     language: 'Language',
     darkMode: 'Dark mode',
     lightMode: 'Light mode',
+    toastAddSuccess: 'Patient record added successfully.',
+    toastEditSuccess: 'Patient record updated successfully.',
+    toastDeleteSuccess: 'Patient record deleted successfully.',
     departments: {
       Dahiliye: 'Internal Medicine',
       Nöroloji: 'Neurology',
