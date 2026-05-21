@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { HiXMark } from 'react-icons/hi2'
 import type { PatientFormData, PatientRecord } from '../types/patient'
 import { useLanguage } from '../context/LanguageContext'
 import {
@@ -8,6 +9,7 @@ import {
   patientToForm,
   STATUSES,
 } from '../utils/patientHelpers'
+import { inputClass, labelClass, selectClass } from '../utils/styles'
 
 interface PatientFormModalProps {
   isOpen: boolean
@@ -70,20 +72,18 @@ export function PatientFormModal({
         onClick={onClose}
         aria-hidden
       />
-      <div className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white px-6 py-4">
-          <h2 className="font-display text-xl font-semibold text-slate-900">
+      <div className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl dark:bg-slate-800">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white px-6 py-4 dark:border-slate-700 dark:bg-slate-800">
+          <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-slate-100">
             {isEdit ? t.editPatient : t.addPatient}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-200"
             aria-label={t.close}
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <HiXMark className="h-5 w-5" />
           </button>
         </div>
 
@@ -103,7 +103,7 @@ export function PatientFormModal({
               <select
                 value={form.department}
                 onChange={(e) => update('department', e.target.value)}
-                className={inputClass}
+                className={selectClass}
               >
                 {DEPARTMENTS.map((d) => (
                   <option key={d} value={d}>
@@ -137,7 +137,7 @@ export function PatientFormModal({
                 onChange={(e) =>
                   update('status', e.target.value as PatientRecord['status'])
                 }
-                className={inputClass}
+                className={selectClass}
               >
                 {STATUSES.map((s) => (
                   <option key={s} value={s}>
@@ -153,7 +153,7 @@ export function PatientFormModal({
                 onChange={(e) =>
                   update('priority', e.target.value as PatientRecord['priority'])
                 }
-                className={inputClass}
+                className={selectClass}
               >
                 <option value="normal">{t.priorityNormal}</option>
                 <option value="acil">{t.priorityUrgent}</option>
@@ -164,7 +164,7 @@ export function PatientFormModal({
               <select
                 value={form.bloodType}
                 onChange={(e) => update('bloodType', e.target.value)}
-                className={inputClass}
+                className={selectClass}
               >
                 {BLOOD_TYPES.map((bt) => (
                   <option key={bt} value={bt}>
@@ -172,17 +172,6 @@ export function PatientFormModal({
                   </option>
                 ))}
               </select>
-            </Field>
-
-            <Field label={t.score}>
-              <input
-                type="number"
-                min={1}
-                max={5}
-                value={form.score}
-                onChange={(e) => update('score', Number(e.target.value))}
-                className={inputClass}
-              />
             </Field>
           </div>
 
@@ -258,11 +247,11 @@ export function PatientFormModal({
             />
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
+          <div className="flex justify-end gap-3 border-t border-slate-100 pt-4 dark:border-slate-700">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
             >
               {t.cancel}
             </button>
@@ -279,9 +268,6 @@ export function PatientFormModal({
   )
 }
 
-const inputClass =
-  'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none transition focus:border-clinic-500 focus:ring-2 focus:ring-clinic-100'
-
 function Field({
   label,
   children,
@@ -293,7 +279,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-medium text-slate-500">
+      <span className={labelClass}>
         {label}
         {required && <span className="text-red-500"> *</span>}
       </span>
@@ -317,9 +303,9 @@ function Checkbox({
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="h-4 w-4 rounded border-slate-300 text-clinic-600 focus:ring-clinic-500"
+        className="h-4 w-4 rounded border-slate-300 text-clinic-600 focus:ring-clinic-500 dark:border-slate-600"
       />
-      <span className="text-sm text-slate-700">{label}</span>
+      <span className="text-sm text-slate-700 dark:text-slate-300">{label}</span>
     </label>
   )
 }

@@ -1,3 +1,4 @@
+import { HiXMark } from 'react-icons/hi2'
 import type { PatientRecord } from '../types/patient'
 import { useLanguage } from '../context/LanguageContext'
 import { formatDate } from '../utils/patientHelpers'
@@ -23,23 +24,23 @@ export function PatientDetailModal({ patient, onClose }: PatientDetailModalProps
         onClick={onClose}
         aria-hidden
       />
-      <div className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl">
-        <div className="flex items-start justify-between border-b border-slate-100 px-6 py-4">
+      <div className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl dark:bg-slate-800">
+        <div className="flex items-start justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-700">
           <div>
-            <h2 className="font-display text-xl font-semibold text-slate-900">
+            <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-slate-100">
               {patient.fullName}
             </h2>
-            <p className="mt-1 text-sm text-slate-500">{patient.id}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              {patient.id}
+            </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100"
+            className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-700"
             aria-label={t.close}
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <HiXMark className="h-5 w-5" />
           </button>
         </div>
 
@@ -50,9 +51,11 @@ export function PatientDetailModal({ patient, onClose }: PatientDetailModalProps
           </div>
 
           <DetailGrid>
-            <DetailItem label={t.department} value={getDepartmentLabel(patient.department)} />
+            <DetailItem
+              label={t.department}
+              value={getDepartmentLabel(patient.department)}
+            />
             <DetailItem label={t.bloodType} value={patient.bloodType} />
-            <DetailItem label={t.score} value={String(patient.score)} />
             <DetailItem
               label={t.birthDate}
               value={formatDate(patient.birthDate, locale)}
@@ -65,17 +68,22 @@ export function PatientDetailModal({ patient, onClose }: PatientDetailModalProps
             <DetailItem label={t.note} value={getNote(patient)} span />
             <DetailItem label={t.isInsured} value={boolLabel(patient.isInsured)} />
             <DetailItem label={t.isFollowUp} value={boolLabel(patient.isFollowUp)} />
-            <DetailItem label={t.isVaccinated} value={boolLabel(patient.isVaccinated)} />
+            <DetailItem
+              label={t.isVaccinated}
+              value={boolLabel(patient.isVaccinated)}
+            />
           </DetailGrid>
 
           {patient.tags.length > 0 && (
             <div>
-              <p className="mb-2 text-xs font-medium text-slate-500">{t.tags}</p>
+              <p className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                {t.tags}
+              </p>
               <div className="flex flex-wrap gap-1.5">
                 {patient.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-md bg-slate-100 px-2 py-0.5 text-xs text-slate-600"
+                    className="rounded-md bg-slate-100 px-2 py-0.5 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300"
                   >
                     {tag}
                   </span>
@@ -85,7 +93,7 @@ export function PatientDetailModal({ patient, onClose }: PatientDetailModalProps
           )}
 
           {patient.notes && (
-            <div className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
+            <div className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600 dark:bg-slate-900/50 dark:text-slate-300">
               {patient.notes}
             </div>
           )}
@@ -111,7 +119,7 @@ function DetailItem({
   return (
     <div className={span ? 'sm:col-span-2' : ''}>
       <p className="text-xs font-medium text-slate-400">{label}</p>
-      <p className="mt-0.5 text-sm text-slate-800">{value}</p>
+      <p className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">{value}</p>
     </div>
   )
 }

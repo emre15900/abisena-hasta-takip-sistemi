@@ -33,5 +33,5 @@ export type PatientFormData = Omit<PatientRecord, 'id' | 'createdAt'> & {
   createdAt?: string
 }
 
-export type SortField = 'fullName' | 'appointmentDate' | 'score'
+export type SortField = 'fullName' | 'appointmentDate' | 'bloodType'
 export type SortDirection = 'asc' | 'desc'

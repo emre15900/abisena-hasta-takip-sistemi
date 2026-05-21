@@ -72,6 +72,7 @@ export function filterAndSortPatients(
   patients: PatientRecord[],
   search: string,
   statusFilter: string,
+  priorityFilter: string,
   sortField: SortField,
   sortDirection: SortDirection,
 ): PatientRecord[] {
@@ -88,6 +89,10 @@ export function filterAndSortPatients(
     result = result.filter((p) => p.status === statusFilter)
   }
 
+  if (priorityFilter) {
+    result = result.filter((p) => p.priority === priorityFilter)
+  }
+
   result.sort((a, b) => {
     let cmp = 0
     switch (sortField) {
@@ -99,14 +104,26 @@ export function filterAndSortPatients(
           new Date(a.appointmentDate).getTime() -
           new Date(b.appointmentDate).getTime()
         break
-      case 'score':
-        cmp = a.score - b.score
+      case 'bloodType':
+        cmp = a.bloodType.localeCompare(b.bloodType)
         break
     }
     return sortDirection === 'asc' ? cmp : -cmp
   })
 
   return result
+}
+
+export function paginatePatients<T>(items: T[], page: number, pageSize: number) {
+  const totalPages = Math.max(1, Math.ceil(items.length / pageSize))
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const start = (safePage - 1) * pageSize
+  return {
+    items: items.slice(start, start + pageSize),
+    currentPage: safePage,
+    totalPages,
+    totalItems: items.length,
+  }
 }
 
 export function formatDate(dateStr: string, locale: 'tr' | 'en'): string {

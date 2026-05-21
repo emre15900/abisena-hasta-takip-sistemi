@@ -17,8 +17,11 @@ Poliklinik hasta randevu ve takip paneli. Abisena / Panates teknik değerlendirm
 | Düzenleme | Local state üzerinde güncellenir |
 | Silme | Local state üzerinden silinir |
 | Arama | Hasta adına göre metin araması |
-| Filtreleme | Randevu durumuna göre filtre |
-| Sıralama | Ad, randevu tarihi veya skora göre artan/azalan |
+| Filtreleme | Durum ve önceliğe göre filtre |
+| Sıralama | Ad, randevu tarihi veya kan grubuna göre |
+| Sayfalama | Sayfa başına 10 kayıt |
+| Mobil | Accordion liste görünümü |
+| Dark mode | Aydınlık / karanlık tema |
 | Dil | TR / EN arayüz desteği |
 
 ## API
