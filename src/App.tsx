@@ -7,6 +7,7 @@ import { PatientFilters } from './components/PatientFilters'
 import { PatientFormModal } from './components/PatientFormModal'
 import { PatientList } from './components/PatientList'
 import { LanguageProvider, useLanguage } from './context/LanguageContext'
+import { useFilterQueryParams } from './hooks/useFilterQueryParams'
 import { usePatients } from './hooks/usePatients'
 import { AntDesignProvider } from './providers/AntDesignProvider'
 import type { PatientFormData, PatientRecord } from './types/patient'
@@ -28,9 +29,16 @@ function AppContent() {
     deletePatient,
   } = usePatients()
 
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
-  const [priorityFilter, setPriorityFilter] = useState('')
+  const {
+    search,
+    statusFilter,
+    priorityFilter,
+    setSearch,
+    setStatusFilter,
+    setPriorityFilter,
+    clearFilters,
+    hasActiveFilters,
+  } = useFilterQueryParams()
 
   const [modalMode, setModalMode] = useState<ModalMode>(null)
   const [editingPatient, setEditingPatient] = useState<PatientRecord | null>(null)
@@ -121,6 +129,8 @@ function AppContent() {
               onStatusFilterChange={setStatusFilter}
               priorityFilter={priorityFilter}
               onPriorityFilterChange={setPriorityFilter}
+              onClearFilters={clearFilters}
+              hasActiveFilters={hasActiveFilters}
             />
 
             <PatientList

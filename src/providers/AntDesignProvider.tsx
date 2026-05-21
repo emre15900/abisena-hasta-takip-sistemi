@@ -19,6 +19,12 @@ export function AntDesignProvider({ children }: { children: ReactNode }) {
           borderRadius: 8,
           fontFamily: "'DM Sans', system-ui, sans-serif",
         },
+        components: {
+          Layout: {
+            headerBg: isDark ? '#141414' : '#ffffff',
+            bodyBg: isDark ? '#000000' : '#f5f5f5',
+          },
+        },
       }}
     >
       {children}
