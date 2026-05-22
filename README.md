@@ -76,12 +76,12 @@ Ekleme, düzenleme ve silme işlemleri tarayıcıda saklanır; tema ve dil terci
 
 ## Tech Stack
 
-- **React 18** (Vite — Next.js kullanılmaz)
+- **React 18** 
 - **TypeScript**
-- **Ant Design 6** (tablo, form, modal, filtreler, dark mode)
-- **Redux Toolkit** (tema, dil, hasta state)
-- **react-hot-toast** (işlem bildirimleri)
-- **Tailwind CSS** (layout yardımcıları)
+- **Ant Design 6** 
+- **Redux Toolkit** 
+- **react-hot-toast** 
+- **Tailwind CSS** 
 
 ## Özellikler
 
