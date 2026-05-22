@@ -1,12 +1,15 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons'
-import { Alert, Button, Layout, Modal, Spin } from 'antd'
+import { Alert, Button, Layout, Modal, Spin, Typography } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
+import { DashboardStats } from './components/DashboardStats'
 import { Header } from './components/Header'
+import { PageBackground } from './components/PageBackground'
 import { PatientDetailModal } from './components/PatientDetailModal'
 import { PatientFilters } from './components/PatientFilters'
 import { PatientFormModal } from './components/PatientFormModal'
 import { PatientList } from './components/PatientList'
+import { PatientPriority, PatientStatus } from './enums'
 import { useFilterQueryParams } from './hooks/useFilterQueryParams'
 import { useLanguage } from './hooks/useLanguage'
 import { AntDesignProvider } from './providers/AntDesignProvider'
@@ -59,6 +62,18 @@ function AppContent() {
     [patients, search, statusFilter, priorityFilter],
   )
 
+  const stats = useMemo(
+    () => ({
+      urgentCount: filteredPatients.filter(
+        (p) => p.priority === PatientPriority.URGENT,
+      ).length,
+      waitingCount: filteredPatients.filter(
+        (p) => p.status === PatientStatus.WAITING,
+      ).length,
+    }),
+    [filteredPatients],
+  )
+
   const handleAdd = () => {
     setEditingPatient(null)
     setModalMode('add')
@@ -109,14 +124,17 @@ function AppContent() {
   }
 
   return (
-    <Layout className="min-h-screen">
+    <Layout className="relative min-h-screen !bg-transparent">
+      <PageBackground />
       <Header onAddClick={handleAdd} />
 
-      <Content className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <Content className="relative z-10 mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         {loading && (
-          <div className="flex flex-col items-center justify-center py-24">
+          <div className="flex flex-col items-center justify-center rounded-2xl py-32">
             <Spin size="large" />
-            <p className="mt-4 text-sm opacity-60">{t.loading}</p>
+            <p className="mt-6 text-sm font-medium text-slate-500 dark:text-slate-400">
+              {t.loading}
+            </p>
           </div>
         )}
 
@@ -126,6 +144,7 @@ function AppContent() {
             message={t.error}
             description={error}
             showIcon
+            className="!rounded-2xl"
             action={
               <Button
                 size="small"
@@ -139,7 +158,14 @@ function AppContent() {
         )}
 
         {!loading && !error && (
-          <div className="space-y-4">
+          <div className="space-y-5">
+            <DashboardStats
+              totalCount={patients.length}
+              filteredCount={filteredPatients.length}
+              urgentCount={stats.urgentCount}
+              waitingCount={stats.waitingCount}
+            />
+
             <PatientFilters
               search={search}
               onSearchChange={setSearch}
@@ -151,12 +177,26 @@ function AppContent() {
               hasActiveFilters={hasActiveFilters}
             />
 
-            <PatientList
-              patients={filteredPatients}
-              onView={setViewingPatient}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
+            <div
+              className="animate-slide-up opacity-0"
+              style={{ animationDelay: '280ms', animationFillMode: 'forwards' }}
+            >
+              <div className="mb-3 flex items-center gap-2 px-1">
+                <Typography.Title level={5} className="!mb-0 !font-display">
+                  {t.patientListTitle}
+                </Typography.Title>
+                <span className="rounded-full bg-clinic-500/10 px-2.5 py-0.5 text-xs font-semibold text-clinic-700 dark:text-clinic-300">
+                  {filteredPatients.length}
+                </span>
+              </div>
+
+              <PatientList
+                patients={filteredPatients}
+                onView={setViewingPatient}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            </div>
           </div>
         )}
       </Content>
@@ -176,10 +216,14 @@ function AppContent() {
   )
 }
 
-export default function App() {
+function AppWithProviders() {
   return (
     <AntDesignProvider>
       <AppContent />
     </AntDesignProvider>
   )
+}
+
+export default function App() {
+  return <AppWithProviders />
 }
