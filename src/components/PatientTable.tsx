@@ -3,7 +3,7 @@ import {
   EditOutlined,
   EyeOutlined,
 } from '@ant-design/icons'
-import { Button, Space, Table, Tag, Typography } from 'antd'
+import { Avatar, Button, Space, Table, Tag, Typography } from 'antd'
 import type { TableColumnsType, TableProps } from 'antd'
 import { useMemo } from 'react'
 import { PAGE_SIZE } from '../constants/pagination'
@@ -24,6 +24,15 @@ const STATUS_COLORS: Record<PatientStatus, string> = {
   [PatientStatus.EXAMINING]: 'processing',
   [PatientStatus.COMPLETED]: 'success',
   [PatientStatus.CANCELLED]: 'error',
+}
+
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
 }
 
 export function PatientTable({
@@ -49,12 +58,22 @@ export function PatientTable({
         key: 'fullName',
         sorter: (a, b) => a.fullName.localeCompare(b.fullName, 'tr'),
         render: (name: string, record) => (
-          <div>
-            <Typography.Text strong>{name}</Typography.Text>
-            <br />
-            <Typography.Text type="secondary" className="text-xs">
-              {record.id}
-            </Typography.Text>
+          <div className="flex items-center gap-3 py-1">
+            <Avatar
+              size={40}
+              className="!bg-gradient-to-br !from-clinic-500 !to-clinic-700 !font-semibold !shadow-sm"
+            >
+              {getInitials(name)}
+            </Avatar>
+            <div>
+              <Typography.Text strong className="!text-[15px]">
+                {name}
+              </Typography.Text>
+              <br />
+              <Typography.Text type="secondary" className="!text-xs">
+                {record.id}
+              </Typography.Text>
+            </div>
           </div>
         ),
       },
@@ -67,7 +86,11 @@ export function PatientTable({
           value: d,
         })),
         onFilter: (value, record) => record.department === value,
-        render: (dept: string) => getDepartmentLabel(dept),
+        render: (dept: string) => (
+          <span className="text-slate-600 dark:text-slate-300">
+            {getDepartmentLabel(dept)}
+          </span>
+        ),
       },
       {
         title: t.bloodType,
@@ -76,7 +99,9 @@ export function PatientTable({
         filters: BLOOD_TYPES.map((bt) => ({ text: bt, value: bt })),
         onFilter: (value, record) => record.bloodType === value,
         sorter: (a, b) => a.bloodType.localeCompare(b.bloodType),
-        render: (bt: string) => <Tag>{bt}</Tag>,
+        render: (bt: string) => (
+          <Tag className="!rounded-lg !px-2.5 !font-semibold">{bt}</Tag>
+        ),
       },
       {
         title: t.status,
@@ -88,7 +113,12 @@ export function PatientTable({
         })),
         onFilter: (value, record) => record.status === value,
         render: (status: PatientStatus) => (
-          <Tag color={STATUS_COLORS[status]}>{getStatusLabel(status)}</Tag>
+          <Tag
+            color={STATUS_COLORS[status]}
+            className="!rounded-lg !px-2.5 !font-medium"
+          >
+            {getStatusLabel(status)}
+          </Tag>
         ),
       },
       {
@@ -107,7 +137,10 @@ export function PatientTable({
         ],
         onFilter: (value, record) => record.priority === value,
         render: (priority: PatientPriority) => (
-          <Tag color={priority === PatientPriority.URGENT ? 'red' : 'default'}>
+          <Tag
+            color={priority === PatientPriority.URGENT ? 'red' : 'default'}
+            className="!rounded-lg !px-2.5 !font-medium"
+          >
             {getPriorityLabel(priority)}
           </Tag>
         ),
@@ -120,35 +153,48 @@ export function PatientTable({
           new Date(a.appointmentDate).getTime() -
           new Date(b.appointmentDate).getTime(),
         defaultSortOrder: 'descend',
-        render: (date: string) => formatDate(date, locale),
+        render: (date: string) => (
+          <span className="tabular-nums text-slate-600 dark:text-slate-300">
+            {formatDate(date, locale)}
+          </span>
+        ),
       },
       {
         title: t.diagnosis,
         key: 'diagnosis',
         ellipsis: true,
-        render: (_, record) => getDiagnosis(record),
+        render: (_, record) => (
+          <span className="text-slate-600 dark:text-slate-400">
+            {getDiagnosis(record)}
+          </span>
+        ),
       },
       {
         title: t.actions,
         key: 'actions',
         align: 'right',
-        width: 140,
+        width: 150,
         render: (_, record) => (
-          <Space size="small">
+          <Space size={4}>
             <Button
               type="text"
+              shape="circle"
               icon={<EyeOutlined />}
               onClick={() => onView(record)}
               title={t.details}
+              className="!text-clinic-600 hover:!bg-clinic-50 dark:!text-clinic-400 dark:hover:!bg-clinic-900/30"
             />
             <Button
               type="text"
+              shape="circle"
               icon={<EditOutlined />}
               onClick={() => onEdit(record)}
               title={t.editPatient}
+              className="!text-amber-600 hover:!bg-amber-50 dark:!text-amber-400"
             />
             <Button
               type="text"
+              shape="circle"
               danger
               icon={<DeleteOutlined />}
               onClick={() => onDelete(record)}
@@ -174,20 +220,28 @@ export function PatientTable({
   const pagination: TableProps<PatientRecord>['pagination'] = {
     pageSize: PAGE_SIZE,
     showSizeChanger: false,
-    showTotal: (total) => `${total} ${t.patientCount}`,
+    showTotal: (total) => (
+      <span className="font-medium text-slate-600 dark:text-slate-400">
+        {total} {t.patientCount}
+      </span>
+    ),
     position: ['bottomCenter'],
   }
 
   return (
-    <div className="hidden md:block">
+    <div
+      className="glass-panel hidden overflow-hidden p-1 opacity-0 animate-slide-up md:block"
+      style={{ animationDelay: '320ms', animationFillMode: 'forwards' }}
+    >
       <Table<PatientRecord>
         rowKey="id"
         columns={columns}
         dataSource={patients}
         pagination={pagination}
         locale={{ emptyText: t.noResults }}
-        scroll={{ x: 900 }}
+        scroll={{ x: 960 }}
         size="middle"
+        className="modern-table"
       />
     </div>
   )

@@ -3,10 +3,10 @@ import {
   EditOutlined,
   EyeOutlined,
 } from '@ant-design/icons'
-import { Button, Card, Collapse, Descriptions, Space, Tag, Typography } from 'antd'
-import type { PatientRecord } from '../types/patient'
+import { Avatar, Button, Collapse, Descriptions, Tag, Typography } from 'antd'
 import { PatientPriority, PatientStatus } from '../enums'
 import { useLanguage } from '../hooks/useLanguage'
+import type { PatientRecord } from '../types/patient'
 import { formatDate } from '../utils/patientHelpers'
 
 const STATUS_COLORS: Record<PatientStatus, string> = {
@@ -14,6 +14,15 @@ const STATUS_COLORS: Record<PatientStatus, string> = {
   [PatientStatus.EXAMINING]: 'processing',
   [PatientStatus.COMPLETED]: 'success',
   [PatientStatus.CANCELLED]: 'error',
+}
+
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
 }
 
 interface PatientAccordionProps {
@@ -41,38 +50,48 @@ export function PatientAccordion({
 
   if (patients.length === 0) {
     return (
-      <Card className="md:hidden">
+      <div className="glass-panel p-8 text-center md:hidden">
         <Typography.Text type="secondary">{t.noResults}</Typography.Text>
-      </Card>
+      </div>
     )
   }
 
   const items = patients.map((patient) => ({
     key: patient.id,
     label: (
-      <div>
-        <Typography.Text strong>{patient.fullName}</Typography.Text>
-        <Typography.Text type="secondary" className="ml-2 text-xs">
-          {patient.id}
-        </Typography.Text>
-        <div className="mt-1 flex flex-wrap gap-1">
-          <Tag color={STATUS_COLORS[patient.status]}>
-            {getStatusLabel(patient.status)}
-          </Tag>
-          <Tag
-            color={
-              patient.priority === PatientPriority.URGENT ? 'red' : 'default'
-            }
-          >
-            {getPriorityLabel(patient.priority)}
-          </Tag>
-          <Tag>{patient.bloodType}</Tag>
+      <div className="flex items-center gap-3 py-1">
+        <Avatar
+          size={36}
+          className="!bg-gradient-to-br !from-clinic-500 !to-clinic-700 !text-sm !font-semibold"
+        >
+          {getInitials(patient.fullName)}
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <Typography.Text strong className="block truncate">
+            {patient.fullName}
+          </Typography.Text>
+          <Typography.Text type="secondary" className="text-xs">
+            {patient.id}
+          </Typography.Text>
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            <Tag color={STATUS_COLORS[patient.status]} className="!rounded-md !text-xs">
+              {getStatusLabel(patient.status)}
+            </Tag>
+            <Tag
+              color={
+                patient.priority === PatientPriority.URGENT ? 'red' : 'default'
+              }
+              className="!rounded-md !text-xs"
+            >
+              {getPriorityLabel(patient.priority)}
+            </Tag>
+          </div>
         </div>
       </div>
     ),
     children: (
       <div className="space-y-3">
-        <Descriptions column={1} size="small" bordered>
+        <Descriptions column={1} size="small" bordered className="!rounded-xl">
           <Descriptions.Item label={t.department}>
             {getDepartmentLabel(patient.department)}
           </Descriptions.Item>
@@ -109,40 +128,51 @@ export function PatientAccordion({
             </Typography.Text>
             <div className="mt-1 flex flex-wrap gap-1">
               {patient.tags.map((tag) => (
-                <Tag key={tag}>{tag}</Tag>
+                <Tag key={tag} className="!rounded-md">
+                  {tag}
+                </Tag>
               ))}
             </div>
           </div>
         )}
 
-        <Space wrap className="w-full">
+        <div className="grid grid-cols-3 gap-2 pt-1">
           <Button
-            icon={<EyeOutlined />}
+            type="primary"
+            ghost
+            size="small"
+            icon={<EyeOutlined className="!text-sm" />}
             onClick={() => onView(patient)}
+            className="!h-8 !rounded-lg !px-1 !text-xs"
           >
             {t.details}
           </Button>
           <Button
-            icon={<EditOutlined />}
+            size="small"
+            icon={<EditOutlined className="!text-sm" />}
             onClick={() => onEdit(patient)}
+            className="!h-8 !rounded-lg !px-1 !text-xs"
+            title={t.editPatient}
           >
-            {t.editPatient}
+            {t.editPatientShort}
           </Button>
           <Button
             danger
-            icon={<DeleteOutlined />}
+            size="small"
+            icon={<DeleteOutlined className="!text-sm" />}
             onClick={() => onDelete(patient)}
+            className="!h-8 !rounded-lg !px-1 !text-xs"
           >
             {t.deletePatient}
           </Button>
-        </Space>
+        </div>
       </div>
     ),
   }))
 
   return (
     <div className="md:hidden">
-      <Collapse items={items} accordion />
+      <Collapse items={items} accordion className="mobile-patient-collapse" />
     </div>
   )
 }
